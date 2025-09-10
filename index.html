@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Halloween Website Builder</title>
+  <style>
+    body {
+      font-family: 'Creepster', cursive;
+      background-color: #0d0d0d;
+      color: #ff7518;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    header {
+      background: black;
+      color: #ff0000;
+      padding: 20px;
+      font-size: 2em;
+      text-shadow: 2px 2px 8px #ff7518;
+    }
+    .builder-controls {
+      padding: 15px;
+      background: #1a1a1a;
+      border-bottom: 2px solid #ff7518;
+    }
+    .builder-controls button {
+      background: #ff7518;
+      color: black;
+      border: none;
+      padding: 10px;
+      margin: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 6px;
+    }
+    .builder-controls button:hover {
+      background: #ff0000;
+      color: white;
+    }
+    section {
+      margin: 20px auto;
+      padding: 20px;
+      background: rgba(255, 117, 24, 0.1);
+      border: 2px solid #ff7518;
+      border-radius: 10px;
+      width: 80%;
+      color: white;
+    }
+    h2, p {
+      cursor: pointer;
+    }
+    img {
+      max-width: 100%;
+      border: 4px solid #ff0000;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+    footer {
+      background: #111;
+      padding: 20px;
+      margin-top: 40px;
+      color: #ff7518;
+      font-size: 1.2em;
+      text-shadow: 1px 1px 4px red;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Nosifer&family=Eater&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header contenteditable="true">🎃 Haunted House Halloween Party 🎃</header>
+  
+  <div class="builder-controls">
+    <button onclick="addSection()">Add Section</button>
+    <button onclick="addImage()">Add Image</button>
+    <button onclick="exportHTML()">Export HTML</button>
+  </div>
+
+  <main id="website"></main>
+
+  <footer contenteditable="true">Contact us: hauntedhouse@example.com | (555) 666-1313</footer>
+
+  <script>
+    function makeEditable(element) {
+      element.setAttribute("contenteditable", "true");
+      element.addEventListener("blur", () => {
+        element.removeAttribute("contenteditable");
+      });
+      element.focus();
+    }
+
+    function addSection() {
+      let section = document.createElement("section");
+
+      let title = document.createElement("h2");
+      title.textContent = "Click to Edit Title";
+      title.onclick = () => makeEditable(title);
+
+      let paragraph = document.createElement("p");
+      paragraph.textContent = "Click to Edit Paragraph...";
+      paragraph.onclick = () => makeEditable(paragraph);
+
+      section.appendChild(title);
+      section.appendChild(paragraph);
+
+      document.getElementById("website").appendChild(section);
+    }
+
+    function addImage() {
+      let url = prompt("Enter image URL:");
+      if (url) {
+        let section = document.createElement("section");
+        let img = document.createElement("img");
+        img.src = url;
+        section.appendChild(img);
+        document.getElementById("website").appendChild(section);
+      }
+    }
+
+    function exportHTML() {
+      let content = document.documentElement.outerHTML;
+      let blob = new Blob([content], { type: "text/html" });
+      let link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "halloween_website.html";
+      link.click();
+    }
+  </script>
+</body>
+</html>
