@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Halloween Website Builder</title>
+  <title>Halloween Website Builder 2.0</title>
   <style>
     body {
       font-family: 'Creepster', cursive;
@@ -25,7 +25,7 @@
       background: #1a1a1a;
       border-bottom: 2px solid #ff7518;
     }
-    .builder-controls button {
+    .builder-controls button, .builder-controls input {
       background: #ff7518;
       color: black;
       border: none;
@@ -47,6 +47,7 @@
       border-radius: 10px;
       width: 80%;
       color: white;
+      position: relative;
     }
     h2, p {
       cursor: pointer;
@@ -65,6 +66,43 @@
       font-size: 1.2em;
       text-shadow: 1px 1px 4px red;
     }
+    /* Delete Button */
+    .delete-btn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: red;
+      color: white;
+      border: none;
+      cursor: pointer;
+      padding: 5px;
+      font-size: 12px;
+      border-radius: 4px;
+    }
+    /* Halloween Icon Styles */
+    .icon {
+      font-size: 3em;
+      margin: 10px;
+      display: inline-block;
+      text-shadow: 0 0 10px red, 0 0 20px orange, 0 0 30px purple;
+      animation: glow 2s infinite alternate;
+      cursor: pointer;
+      position: relative;
+    }
+    @keyframes glow {
+      0% { color: orange; text-shadow: 0 0 10px red, 0 0 20px orange; }
+      50% { color: red; text-shadow: 0 0 15px purple, 0 0 30px orange; }
+      100% { color: purple; text-shadow: 0 0 20px red, 0 0 40px orange; }
+    }
+    #iconLibrary {
+      margin: 15px 0;
+      background: #222;
+      padding: 10px;
+      border: 2px solid #ff7518;
+      border-radius: 8px;
+      max-height: 200px;
+      overflow-y: scroll;
+    }
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Nosifer&family=Eater&display=swap" rel="stylesheet">
 </head>
@@ -74,7 +112,26 @@
   <div class="builder-controls">
     <button onclick="addSection()">Add Section</button>
     <button onclick="addImage()">Add Image</button>
+    <button onclick="toggleIcons()">Toggle Icon Library</button>
+    <label>Text Color: <input type="color" id="textColor" onchange="changeTextColor(this.value)"></label>
+    <label>Background: <input type="color" id="bgColor" onchange="changeBgColor(this.value)"></label>
     <button onclick="exportHTML()">Export HTML</button>
+  </div>
+
+  <div id="iconLibrary" style="display:none;">
+    <!-- Expanded Halloween Icon Library -->
+    <div>
+      🎃 👻 🕷️ 🦇 💀 🩸 🕸️ 🧛 🧟 🧙 🪦 🕯️ 🕰️ 🧹 🧿 🩹 🪓 🔮 ☠️ 🦴 🪲 🕎 🐍 🐀 🕊️ 🧵 🪢 🗡️ 🔥 🩻 🦉 🐺 🐈‍⬛ 🧴 🧫 🧪 🧬 🕷 🐛 🐜 🦂 🐝 🐦 🧊 🪄 🏚️ 🏴‍☠️ ⚰️ 🔔 🕳️ 🪤
+    </div>
+    <script>
+      // turn them into clickable icons dynamically
+      document.addEventListener("DOMContentLoaded", () => {
+        let lib = document.getElementById("iconLibrary");
+        lib.querySelectorAll("div").forEach(div => {
+          div.innerHTML = div.textContent.split(" ").map(sym => sym ? `<span class="icon" onclick="addIcon('${sym}')">${sym}</span>` : "").join("");
+        });
+      });
+    </script>
   </div>
 
   <main id="website"></main>
@@ -101,6 +158,12 @@
       paragraph.textContent = "Click to Edit Paragraph...";
       paragraph.onclick = () => makeEditable(paragraph);
 
+      let delBtn = document.createElement("button");
+      delBtn.className = "delete-btn";
+      delBtn.textContent = "X";
+      delBtn.onclick = () => section.remove();
+
+      section.appendChild(delBtn);
       section.appendChild(title);
       section.appendChild(paragraph);
 
@@ -113,13 +176,56 @@
         let section = document.createElement("section");
         let img = document.createElement("img");
         img.src = url;
+
+        let delBtn = document.createElement("button");
+        delBtn.className = "delete-btn";
+        delBtn.textContent = "X";
+        delBtn.onclick = () => section.remove();
+
+        section.appendChild(delBtn);
         section.appendChild(img);
         document.getElementById("website").appendChild(section);
       }
     }
 
+    function toggleIcons() {
+      let lib = document.getElementById("iconLibrary");
+      lib.style.display = lib.style.display === "none" ? "block" : "none";
+    }
+
+    function addIcon(symbol) {
+      let section = document.createElement("section");
+      let span = document.createElement("span");
+      span.className = "icon";
+      span.textContent = symbol;
+
+      let delBtn = document.createElement("button");
+      delBtn.className = "delete-btn";
+      delBtn.textContent = "X";
+      delBtn.onclick = () => section.remove();
+
+      section.appendChild(delBtn);
+      section.appendChild(span);
+      document.getElementById("website").appendChild(section);
+    }
+
+    function changeTextColor(color) {
+      document.body.style.color = color;
+    }
+
+    function changeBgColor(color) {
+      document.body.style.backgroundColor = color;
+    }
+
     function exportHTML() {
-      let content = document.documentElement.outerHTML;
+      let clone = document.documentElement.cloneNode(true);
+      clone.querySelectorAll("[contenteditable]").forEach(el => el.removeAttribute("contenteditable"));
+      let controls = clone.querySelector(".builder-controls");
+      if (controls) controls.remove();
+      let lib = clone.querySelector("#iconLibrary");
+      if (lib) lib.remove();
+
+      let content = "<!DOCTYPE html>\n" + clone.outerHTML;
       let blob = new Blob([content], { type: "text/html" });
       let link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
