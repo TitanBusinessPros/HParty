@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Halloween Website Builder 2.0</title>
+  <title>Halloween Website Builder Fixed</title>
   <style>
     body {
       font-family: 'Creepster', cursive;
@@ -12,6 +12,7 @@
       margin: 0;
       padding: 0;
       text-align: center;
+      overflow-x: hidden;
     }
     header {
       background: black;
@@ -24,20 +25,19 @@
       padding: 15px;
       background: #1a1a1a;
       border-bottom: 2px solid #ff7518;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
     }
     .builder-controls button, .builder-controls input {
       background: #ff7518;
       color: black;
       border: none;
       padding: 10px;
-      margin: 5px;
       cursor: pointer;
       font-weight: bold;
       border-radius: 6px;
-    }
-    .builder-controls button:hover {
-      background: #ff0000;
-      color: white;
     }
     section {
       margin: 20px auto;
@@ -86,8 +86,11 @@
       display: inline-block;
       text-shadow: 0 0 10px red, 0 0 20px orange, 0 0 30px purple;
       animation: glow 2s infinite alternate;
-      cursor: pointer;
-      position: relative;
+      cursor: grab;
+      position: absolute;
+    }
+    .icon:active {
+      cursor: grabbing;
     }
     @keyframes glow {
       0% { color: orange; text-shadow: 0 0 10px red, 0 0 20px orange; }
@@ -95,13 +98,22 @@
       100% { color: purple; text-shadow: 0 0 20px red, 0 0 40px orange; }
     }
     #iconLibrary {
-      margin: 15px 0;
+      margin: 15px auto;
       background: #222;
       padding: 10px;
       border: 2px solid #ff7518;
       border-radius: 8px;
       max-height: 200px;
-      overflow-y: scroll;
+      overflow-y: auto;
+      width: 80%;
+      display: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+      gap: 10px;
+    }
+    #iconLibrary span {
+      cursor: pointer;
+      font-size: 2em;
     }
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Nosifer&family=Eater&display=swap" rel="stylesheet">
@@ -113,38 +125,48 @@
     <button onclick="addSection()">Add Section</button>
     <button onclick="addImage()">Add Image</button>
     <button onclick="toggleIcons()">Toggle Icon Library</button>
-    <label>Text Color: <input type="color" id="textColor" onchange="changeTextColor(this.value)"></label>
+    <label>Text Color: <input type="color" id="textColor" onchange="setEditColor(this.value)"></label>
     <label>Background: <input type="color" id="bgColor" onchange="changeBgColor(this.value)"></label>
+    <label>Icon Size: <input type="range" id="iconSize" min="20" max="150" value="48" oninput="resizeIcons(this.value)"></label>
     <button onclick="exportHTML()">Export HTML</button>
   </div>
 
-  <div id="iconLibrary" style="display:none;">
-    <!-- Expanded Halloween Icon Library -->
-    <div>
-      🎃 👻 🕷️ 🦇 💀 🩸 🕸️ 🧛 🧟 🧙 🪦 🕯️ 🕰️ 🧹 🧿 🩹 🪓 🔮 ☠️ 🦴 🪲 🕎 🐍 🐀 🕊️ 🧵 🪢 🗡️ 🔥 🩻 🦉 🐺 🐈‍⬛ 🧴 🧫 🧪 🧬 🕷 🐛 🐜 🦂 🐝 🐦 🧊 🪄 🏚️ 🏴‍☠️ ⚰️ 🔔 🕳️ 🪤
-    </div>
-    <script>
-      // turn them into clickable icons dynamically
-      document.addEventListener("DOMContentLoaded", () => {
-        let lib = document.getElementById("iconLibrary");
-        lib.querySelectorAll("div").forEach(div => {
-          div.innerHTML = div.textContent.split(" ").map(sym => sym ? `<span class="icon" onclick="addIcon('${sym}')">${sym}</span>` : "").join("");
-        });
-      });
-    </script>
+  <div id="iconLibrary">
+    <!-- 50+ Halloween icons -->
+    <span onclick="addIcon('🎃')">🎃</span><span onclick="addIcon('👻')">👻</span><span onclick="addIcon('🕷️')">🕷️</span>
+    <span onclick="addIcon('🦇')">🦇</span><span onclick="addIcon('💀')">💀</span><span onclick="addIcon('🩸')">🩸</span>
+    <span onclick="addIcon('🕸️')">🕸️</span><span onclick="addIcon('🧛')">🧛</span><span onclick="addIcon('🧟')">🧟</span>
+    <span onclick="addIcon('🧙')">🧙</span><span onclick="addIcon('🪦')">🪦</span><span onclick="addIcon('🕯️')">🕯️</span>
+    <span onclick="addIcon('🪓')">🪓</span><span onclick="addIcon('⚰️')">⚰️</span><span onclick="addIcon('🧪')">🧪</span>
+    <span onclick="addIcon('🧞')">🧞</span><span onclick="addIcon('🧌')">🧌</span><span onclick="addIcon('🧜')">🧜</span>
+    <span onclick="addIcon('🧚')">🧚</span><span onclick="addIcon('🧝')">🧝</span><span onclick="addIcon('🧟‍♀️')">🧟‍♀️</span>
+    <span onclick="addIcon('🧟‍♂️')">🧟‍♂️</span><span onclick="addIcon('🧞‍♂️')">🧞‍♂️</span><span onclick="addIcon('🧞‍♀️')">🧞‍♀️</span>
+    <span onclick="addIcon('🔮')">🔮</span><span onclick="addIcon('🐍')">🐍</span><span onclick="addIcon('🐀')">🐀</span>
+    <span onclick="addIcon('🐈‍⬛')">🐈‍⬛</span><span onclick="addIcon('🐺')">🐺</span><span onclick="addIcon('🦉')">🦉</span>
+    <span onclick="addIcon('🕰️')">🕰️</span><span onclick="addIcon('🔥')">🔥</span><span onclick="addIcon('🕳️')">🕳️</span>
+    <span onclick="addIcon('🦂')">🦂</span><span onclick="addIcon('🦴')">🦴</span><span onclick="addIcon('🧄')">🧄</span>
+    <span onclick="addIcon('🏚️')">🏚️</span><span onclick="addIcon('🏴‍☠️')">🏴‍☠️</span><span onclick="addIcon('🪤')">🪤</span>
+    <span onclick="addIcon('🪡')">🪡</span><span onclick="addIcon('🧤')">🧤</span><span onclick="addIcon('🪆')">🪆</span>
   </div>
 
   <main id="website"></main>
 
-  <footer contenteditable="true">Contact us: hauntedhouse@example.com | (555) 666-1313</footer>
+  <footer contenteditable="true">Contact us: hauntedhouse@example.com | (555) 123-1313</footer>
 
   <script>
+    let currentTextColor = "#ff7518";
+
     function makeEditable(element) {
       element.setAttribute("contenteditable", "true");
+      element.style.color = currentTextColor;
       element.addEventListener("blur", () => {
         element.removeAttribute("contenteditable");
       });
       element.focus();
+    }
+
+    function setEditColor(color) {
+      currentTextColor = color;
     }
 
     function addSection() {
@@ -190,27 +212,59 @@
 
     function toggleIcons() {
       let lib = document.getElementById("iconLibrary");
-      lib.style.display = lib.style.display === "none" ? "block" : "none";
+      lib.style.display = lib.style.display === "none" ? "grid" : "none";
     }
 
     function addIcon(symbol) {
-      let section = document.createElement("section");
       let span = document.createElement("span");
       span.className = "icon";
       span.textContent = symbol;
+      span.style.fontSize = document.getElementById("iconSize").value + "px";
+      span.style.left = "100px";
+      span.style.top = "300px";
 
+      // drag
+      span.onmousedown = dragMouseDown;
+
+      // delete button
       let delBtn = document.createElement("button");
       delBtn.className = "delete-btn";
       delBtn.textContent = "X";
-      delBtn.onclick = () => section.remove();
+      delBtn.onclick = () => span.remove();
+      span.appendChild(delBtn);
 
-      section.appendChild(delBtn);
-      section.appendChild(span);
-      document.getElementById("website").appendChild(section);
+      document.body.appendChild(span);
     }
 
-    function changeTextColor(color) {
-      document.body.style.color = color;
+    function resizeIcons(size) {
+      document.querySelectorAll(".icon").forEach(icon => {
+        icon.style.fontSize = size + "px";
+      });
+    }
+
+    // Drag-and-drop
+    function dragMouseDown(e) {
+      if (e.target.classList.contains("delete-btn")) return; // prevent dragging when clicking X
+      e.preventDefault();
+      let elmnt = e.target.closest(".icon");
+      let shiftX = e.clientX - elmnt.getBoundingClientRect().left;
+      let shiftY = e.clientY - elmnt.getBoundingClientRect().top;
+
+      function moveAt(pageX, pageY) {
+        elmnt.style.left = pageX - shiftX + 'px';
+        elmnt.style.top = pageY - shiftY + 'px';
+      }
+
+      function mouseMoveHandler(e) {
+        moveAt(e.pageX, e.pageY);
+      }
+
+      document.addEventListener('mousemove', mouseMoveHandler);
+
+      elmnt.onmouseup = function() {
+        document.removeEventListener('mousemove', mouseMoveHandler);
+        elmnt.onmouseup = null;
+      };
     }
 
     function changeBgColor(color) {
@@ -219,11 +273,13 @@
 
     function exportHTML() {
       let clone = document.documentElement.cloneNode(true);
+
       clone.querySelectorAll("[contenteditable]").forEach(el => el.removeAttribute("contenteditable"));
       let controls = clone.querySelector(".builder-controls");
       if (controls) controls.remove();
       let lib = clone.querySelector("#iconLibrary");
       if (lib) lib.remove();
+      clone.querySelectorAll(".delete-btn").forEach(btn => btn.remove());
 
       let content = "<!DOCTYPE html>\n" + clone.outerHTML;
       let blob = new Blob([content], { type: "text/html" });
